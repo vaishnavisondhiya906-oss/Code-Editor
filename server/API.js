@@ -1,0 +1,255 @@
+const express = require("express");
+const path = require("path");
+const cors = require("cors");
+const mysql = require("mysql2");
+const bcrypt = require("bcrypt");
+const { spawn } = require("child_process");
+const WebSocket = require("ws");
+const fs = require("fs");
+
+console.log("🚀 SERVER STARTING...");
+
+const app = express();
+const PORT = 3000;
+
+/* ================= DB ================= */
+const db = mysql.createPool({
+  host: "localhost",
+  user: "root",
+  password: "Rewa@123",
+  database: "codeeditor",
+});
+
+/* ================= MIDDLEWARE ================= */
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
+
+/* ================= SIGNUP ================= */
+app.post("/api/signup", async (req, res) => {
+  const { name, email, password } = req.body;
+
+  if (!name || !email || !password) {
+    return res.status(400).json({ msg: "All fields required" });
+  }
+
+  db.query("SELECT * FROM users WHERE email=?", [email], async (err, result) => {
+    if (err) return res.status(500).json({ msg: "DB error" });
+
+    if (result.length > 0) {
+      return res.json({ msg: "User already exists" });
+    }
+
+    const hash = await bcrypt.hash(password, 10);
+
+    db.query(
+      "INSERT INTO users(name,email,password) VALUES(?,?,?)",
+      [name, email, hash],
+      (err) => {
+        if (err) return res.status(500).json({ msg: "Insert failed" });
+        res.json({ msg: "Registered ✅" });
+      }
+    );
+  });
+});
+
+/* ================= LOGIN ================= */
+app.post("/api/login", (req, res) => {
+  const { email, password } = req.body;
+
+  db.query("SELECT * FROM users WHERE email=?", [email], async (err, result) => {
+    if (err) return res.status(500).json({ msg: "DB error" });
+
+    if (result.length === 0) {
+      return res.json({ msg: "User not found ❌" });
+    }
+
+    const user = result[0];
+    const match = await bcrypt.compare(password, user.password);
+
+    if (!match) {
+      return res.json({ msg: "Wrong password ❌" });
+    }
+
+    res.json({
+      msg: "Login success ✅",
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email
+      }
+    });
+  });
+});
+
+/* ================= FORGOT PASSWORD ================= */
+app.post("/forgot-password", (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ message: "Email required ❌" });
+  }
+
+  db.query("SELECT * FROM users WHERE email=?", [email], (err, result) => {
+    if (err) return res.status(500).json({ message: "DB error" });
+
+    if (result.length === 0) {
+      return res.status(404).json({ message: "Email not registered ❌" });
+    }
+
+    res.json({ message: "Email verified ✅" });
+  });
+});
+
+/* ================= RESET PASSWORD ================= */
+app.post("/reset-password", async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ message: "Missing data ❌" });
+  }
+
+  try {
+    const hash = await bcrypt.hash(password, 10);
+
+    db.query(
+      "UPDATE users SET password=? WHERE email=?",
+      [hash, email],
+      (err, result) => {
+        if (err) return res.status(500).json({ message: "Update failed ❌" });
+
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ message: "User not found ❌" });
+        }
+
+        res.json({ message: "Password updated ✅" });
+      }
+    );
+  } catch (err) {
+    res.status(500).json({ message: "Server error ❌" });
+  }
+});
+
+/* ================= QUESTIONS ================= */
+app.get("/api/questions", (req, res) => {
+  db.query("SELECT * FROM questions", (err, result) => {
+    if (err) return res.json([]);
+    res.json(result);
+  });
+});
+
+/* ================= USER PROGRESS ================= */
+app.get("/api/progress/:userId", (req, res) => {
+  const userId = req.params.userId;
+
+  db.query(
+    `SELECT q.id, q.title,
+     IFNULL(p.solved, false) as solved
+     FROM questions q
+     LEFT JOIN progress p
+     ON q.id = p.question_id AND p.user_id = ?`,
+    [userId],
+    (err, result) => {
+      if (err) {
+        console.log("Progress API Error:", err);
+        return res.json([]);
+      }
+      res.json(result);
+    }
+  );
+});
+
+/* ================= MARK COMPLETE ================= */
+app.post("/api/progress", (req, res) => {
+  const { userId, questionId } = req.body;
+
+  db.query(
+    `INSERT INTO progress(user_id, question_id, solved)
+     VALUES (?, ?, true)
+     ON DUPLICATE KEY UPDATE solved = true`,
+    [userId, questionId],
+    (err) => {
+      if (err) return res.json({ msg: "Error saving" });
+      res.json({ msg: "Saved ✅" });
+    }
+  );
+});
+
+/* ================= START SERVER ================= */
+const server = app.listen(PORT, () => {
+  console.log(`🚀 HTTP + WS running on http://localhost:${PORT}`);
+});
+
+/* ================= WEBSOCKET ================= */
+const wss = new WebSocket.Server({ server });
+
+wss.on("connection", (ws) => {
+  console.log("⚡ WS Connected");
+
+  let processRun = null;
+
+  ws.on("message", (msg) => {
+    const data = JSON.parse(msg);
+
+    if (data.type === "start") {
+
+      if (processRun) processRun.kill("SIGKILL");
+
+      const id = Date.now();
+
+      if (data.lang === "Cpp") {
+        const file = `temp_${id}.cpp`;
+        const exe = `temp_${id}.exe`;
+
+        fs.writeFileSync(file, data.code);
+
+        spawn("g++", [file, "-o", exe]).on("close", () => {
+          processRun = spawn(exe);
+          attachIO(ws, processRun);
+        });
+      }
+
+      else if (data.lang === "Python") {
+        const file = `temp_${id}.py`;
+
+        fs.writeFileSync(file, data.code);
+
+        processRun = spawn("python", [file]);
+        attachIO(ws, processRun);
+      }
+
+      else if (data.lang === "Java") {
+        const className = `Main${id}`;
+        const file = `${className}.java`;
+
+        const code = data.code.replace(/class\s+Main/g, `class ${className}`);
+        fs.writeFileSync(file, code);
+
+        spawn("javac", [file]).on("close", () => {
+          processRun = spawn("java", [className]);
+          attachIO(ws, processRun);
+        });
+      }
+    }
+
+    if (data.type === "input" && processRun) {
+      processRun.stdin.write(data.value + "\n");
+    }
+  });
+});
+
+/* ================= IO ================= */
+function attachIO(ws, processRun) {
+  processRun.stdout.on("data", d => {
+    ws.send(JSON.stringify({ type: "output", value: d.toString() }));
+  });
+
+  processRun.stderr.on("data", d => {
+    ws.send(JSON.stringify({ type: "output", value: d.toString() }));
+  });
+
+  processRun.on("close", () => {
+    ws.send(JSON.stringify({ type: "output", value: "\n[Finished]" }));
+  });
+}

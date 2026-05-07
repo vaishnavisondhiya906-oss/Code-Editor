@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Home</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    .hero {
+      height: 90vh;
+      background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.8)),
+      url("https://images.unsplash.com/photo-1518770660439-4636190af475");
+      background-size: cover;
+      background-position: center;
+      color: white;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      font-weight: bold;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      color: #ddd;
+    }
+
+    .btn-custom {
+      padding: 12px 25px;
+      font-size: 18px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+
+<body class="bg-dark text-light">
+
+<!-- ✅ NAVBAR LOAD -->
+<div id="header"></div>
+
+<!-- HERO -->
+<div class="hero d-flex align-items-center text-center">
+  <div class="container">
+    <h1>Write. Compile. Run.</h1>
+    <p class="mb-4">Practice coding, solve problems, and improve your skills 🚀</p>
+
+    <!-- ✅ BUTTONS FIXED -->
+    <a href="practice.html" class="btn btn-primary btn-lg me-3 btn-custom">
+      Start Practice
+    </a>
+
+    <button onclick="goEditor()" class="btn btn-outline-light btn-lg btn-custom">
+      Free Code Editor
+    </button>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<div class="container py-5">
+  <div class="row text-center">
+
+    <div class="col-md-4">
+      <h4>📚 Practice Problems</h4>
+      <p>Solve coding questions and track your progress.</p>
+    </div>
+
+    <div class="col-md-4">
+      <h4>💻 Code Editor</h4>
+      <p>Write and run code in Java, C++ and Python.</p>
+    </div>
+
+    <div class="col-md-4">
+      <h4>📊 Progress Tracking</h4>
+      <p>See which problems you solved and improve daily.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="bg-black text-center text-light py-3">
+  <p class="mb-0">© 2026 CodeEditor | Made by Vaishnavi 🚀</p>
+</footer>
+
+<!-- ✅ LOAD NAVBAR -->
+<script src="js/header.js"></script>
+
+<!-- ✅ IMPORTANT FIX -->
+<script>
+function goEditor() {
+  // redirect WITHOUT question (free coding mode)
+  window.location.href = "editor.html";
+}
+</script>
+
+</body>
+</html>

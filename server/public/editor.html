@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Editor</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<link rel="stylesheet" href="codemirror-5.65.21/lib/codemirror.css">
+<link rel="stylesheet" href="codemirror-5.65.21/theme/dracula.css">
+
+<script src="codemirror-5.65.21/lib/codemirror.js"></script>
+<script src="codemirror-5.65.21/mode/clike/clike.js"></script>
+<script src="codemirror-5.65.21/mode/python/python.js"></script>
+<script src="codemirror-5.65.21/addon/edit/closebrackets.js"></script>
+
+<style>
+body{
+  margin:0;
+  background:#0d1117;
+  color:white;
+  height:100vh;
+  overflow:hidden;
+}
+
+.main{ height:100vh; display:flex; flex-direction:column; }
+
+.topbar{
+  height:40px;
+  background:#161b22;
+  display:flex;
+  align-items:center;
+  padding:0 10px;
+  gap:10px;
+}
+
+.content{ flex:1; display:flex; overflow:hidden; }
+
+.left{
+  width:30%;
+  background:#161b22;
+  padding:10px;
+  overflow-y:auto;
+  border-right:1px solid #30363d;
+  display:none;
+}
+
+.right{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  padding:10px;
+}
+
+.CodeMirror{
+  height:100% !important;
+  flex:1;
+  font-size:14px;
+  border-radius:10px;
+}
+
+.io{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+  height:180px;
+}
+
+.io textarea{
+  width:100%;
+  height:100%;
+  background:#0d1117;
+  color:white;
+  border:1px solid #30363d;
+  border-radius:8px;
+  padding:10px;
+  resize:none;
+  overflow:auto;
+}
+</style>
+</head>
+
+<body>
+
+<div class="main">
+
+  <div class="topbar">
+    <select id="lang">
+      <option value="Cpp">C++</option>
+      <option value="Java">Java</option>
+      <option value="Python">Python</option>
+    </select>
+
+    <button class="btn btn-success" id="run">▶ Run</button>
+  </div>
+
+  <div class="content">
+
+    <!-- QUESTION PANEL -->
+    <div class="left" id="questionBox">
+      <h5 id="qTitle"></h5>
+      <p id="qDesc"></p>
+      <button class="btn btn-success mt-3" id="markDone">
+        Mark Completed
+      </button>
+    </div>
+
+    <!-- EDITOR -->
+    <div class="right">
+      <textarea id="editor"></textarea>
+
+      <div class="io">
+        <textarea id="input" placeholder="Input here..."></textarea>
+        <textarea id="output" readonly placeholder="Output..."></textarea>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="js/editor.js"></script>
+
+</body>
+</html>

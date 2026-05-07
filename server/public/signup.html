@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Signup</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .main-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card {
+      background: #1e293b;
+      border-radius: 12px;
+      width: 400px;
+      padding: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- ✅ NAVBAR -->
+<div id="header"></div>
+
+<div class="main-container">
+  <div class="card text-light shadow-lg">
+
+    <h3 class="text-center mb-4">Create Account</h3>
+    
+    <!-- ✅ FIXED FORM -->
+    <form onsubmit="signup(event)">
+      <input type="text" id="name" class="form-control mb-3" placeholder="Enter name" required>
+      <input type="email" id="email" class="form-control mb-3" placeholder="Enter email" required>
+      <input type="password" id="password" class="form-control mb-3" placeholder="Enter password" required>
+
+      <button type="submit" class="btn btn-primary w-100">
+        Signup
+      </button>
+    </form>
+
+    <p class="text-center mt-3">
+      Already have an account? 
+      <a href="login.html" class="text-info">Login</a>
+    </p>
+
+  </div>
+</div>
+
+<!-- ✅ SCRIPTS -->
+<script src="js/header.js"></script>
+<script src="js/signup.js"></script>
+
+</body>
+</html>
