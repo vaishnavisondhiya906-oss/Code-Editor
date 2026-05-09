@@ -202,7 +202,7 @@ const server = app.listen(PORT, () => {
 });
 
 /* ================= WEBSOCKET ================= */
-const WebSocket = require("ws");
+
 const wss = new WebSocket.Server({ server });
 
 wss.on("connection", (ws) => {
