@@ -23,10 +23,10 @@ const db = mysql.createPool({
 
 //   Render Environment Variables:
 // Key	Value
-// DB_HOST	railway ka host
+// DB_HOST	server
 // DB_USER	root
-// DB_PASSWORD	tumhara password
-// DB_NAME	railway/codeeditor
+// DB_PASSWORD	Rewa@123
+// DB_NAME	codeeditor
 // DB_PORT	3306
 
   host: process.env.DB_HOST,
