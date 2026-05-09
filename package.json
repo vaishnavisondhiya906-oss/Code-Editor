@@ -115,5 +115,13 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs"
+  "type": "commonjs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vaishnavisondhiya906-oss/Code-Editor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vaishnavisondhiya906-oss/Code-Editor/issues"
+  },
+  "homepage": "https://github.com/vaishnavisondhiya906-oss/Code-Editor#readme"
 }

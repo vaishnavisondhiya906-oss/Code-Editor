@@ -10,15 +10,35 @@ const fs = require("fs");
 console.log("🚀 SERVER STARTING...");
 
 const app = express();
-const PORT = 3000;
+// const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 /* ================= DB ================= */
 const db = mysql.createPool({
-  host: "localhost",
-  user: "root",
-  password: "Rewa@123",
-  database: "codeeditor",
+  
+  // host: "server",
+  // user: "root",
+  // password: "Rewa@123",
+  // database: "codeeditor",
+
+//   Render Environment Variables:
+// Key	Value
+// DB_HOST	railway ka host
+// DB_USER	root
+// DB_PASSWORD	tumhara password
+// DB_NAME	railway/codeeditor
+// DB_PORT	3306
+
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT,
+
 });
+  
+
+
 
 /* ================= MIDDLEWARE ================= */
 app.use(cors());
