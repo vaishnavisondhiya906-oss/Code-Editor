@@ -85,7 +85,7 @@ if (questionId) {
 /* LOAD QUESTION */
 async function loadQuestion() {
   try {
-    const res = await fetch("http://localhost:3000/api/questions");
+    const res = await fetch("https://online-code-editor-backend-vowg.onrender.com/api/questions");
     const data = await res.json();
 
     const q = data.find(item => item.id == questionId);
