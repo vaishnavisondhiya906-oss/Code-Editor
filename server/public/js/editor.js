@@ -48,21 +48,39 @@ socket.onmessage = (event) => {
 };
 
 /* RUN CODE */
+// runBtn.addEventListener("click", () => {
+
+
+//   if (socket.readyState !== WebSocket.OPEN) {
+//     alert("Server connecting... please wait");
+//     return;
+//   }
+
+//   output.value = "";
+
+//   socket.send(JSON.stringify({
+//     type: "start",
+//     code: editor.getValue(),
+//     lang: lang.value
+//   }));
+// });
+
 runBtn.addEventListener("click", () => {
-
-
-  if (socket.readyState !== WebSocket.OPEN) {
-    alert("Server connecting... please wait");
-    return;
-  }
 
   output.value = "";
 
-  socket.send(JSON.stringify({
-    type: "start",
-    code: editor.getValue(),
-    lang: lang.value
-  }));
+  if (socket.readyState === WebSocket.OPEN) {
+
+    socket.send(JSON.stringify({
+      type: "start",
+      code: editor.getValue(),
+      lang: lang.value
+    }));
+
+  } else {
+    alert("Server not connected ❌");
+  }
+
 });
 
 /* INPUT SYSTEM */
