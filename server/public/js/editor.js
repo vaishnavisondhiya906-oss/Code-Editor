@@ -27,7 +27,7 @@ const output = document.getElementById("output");
 const lang = document.getElementById("lang");
 
 /* ================= SOCKET ================= */
-const socket = new WebSocket("ws://localhost:3000");
+const socket = new WebSocket("ws://online-code-editor-backend-vowg.onrender.com");
 
 socket.onopen = () => console.log("WS Connected");
 socket.onerror = (e) => console.log("WS Error", e);
@@ -106,7 +106,7 @@ const user = JSON.parse(localStorage.getItem("user"));
 if (questionId && user) {
   document.getElementById("markDone").addEventListener("click", async () => {
 
-    await fetch("http://localhost:3000/api/progress", {
+    await fetch("https://online-code-editor-backend-vowg.onrender.com/api/progress", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
