@@ -30,7 +30,11 @@ const lang = document.getElementById("lang");
 const socket = new WebSocket("wss://online-code-editor-backend-vowg.onrender.com");
 
 socket.onopen = () => console.log("WS Connected");
-socket.onerror = (e) => console.log("WS Error", e);
+// socket.onerror = (e) => console.log("WS Error", e);
+socket.onerror = (e) => {
+  console.log("WS Error", e);
+  alert("WebSocket connection failed ❌");
+};
 socket.onclose = () => console.log("WS Closed");
 
 /* RECEIVE OUTPUT */
@@ -45,6 +49,13 @@ socket.onmessage = (event) => {
 
 /* RUN CODE */
 runBtn.addEventListener("click", () => {
+
+
+  if (socket.readyState !== WebSocket.OPEN) {
+    alert("Server connecting... please wait");
+    return;
+  }
+
   output.value = "";
 
   socket.send(JSON.stringify({

@@ -1,6 +1,6 @@
 const tbody = document.getElementById("question-list");
 
-const user = JSON.parse(localStorage.getItem("user"));
+const user = JSON.parse(localStorage.getItem("user")|| "null");
 
 
 if (!user) {

@@ -5,7 +5,7 @@ fetch("header.html")
 
     // ✅ NAVBAR LOGIC (NO auth.js needed)
     const navRight = document.getElementById("nav-right");
-    const user = JSON.parse(localStorage.getItem("user"));
+    const user = JSON.parse(localStorage.getItem("user")|| "null");
 
     if (!navRight) return;
 
