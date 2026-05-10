@@ -197,8 +197,13 @@ app.post("/api/progress", (req, res) => {
 });
 
 /* ================= START SERVER ================= */
-const server = app.listen(PORT, () => {
-  console.log(`🚀 HTTP + WS running on http://localhost:${PORT}`);
+
+const http = require("http");
+
+const server = http.createServer(app);
+
+server.listen(PORT, () => {
+  console.log(`🚀 HTTP + WS running on PORT ${PORT}`);
 });
 
 /* ================= WEBSOCKET ================= */
@@ -206,6 +211,11 @@ const server = app.listen(PORT, () => {
 const wss = new WebSocket.Server({ server });
 
 wss.on("connection", (ws) => {
+
+    ws.on("error", (err) => {
+    console.log("WS ERROR:", err);
+  });
+
   console.log("⚡ WS Connected");
 
   let processRun = null;
@@ -219,39 +229,127 @@ wss.on("connection", (ws) => {
 
       const id = Date.now();
 
+      // if (data.lang === "Cpp") {
+      //   const file = `temp_${id}.cpp`;
+      //   const exe = `temp_${id}.exe`;
+
+      //   fs.writeFileSync(file, data.code);
+
+      //   spawn("g++", [file, "-o", exe]).on("close", () => {
+      //     processRun = spawn(exe);
+      //     attachIO(ws, processRun);
+      //   });
+      // }
+
       if (data.lang === "Cpp") {
-        const file = `temp_${id}.cpp`;
-        const exe = `temp_${id}.exe`;
 
-        fs.writeFileSync(file, data.code);
+       const file = `temp_${id}.cpp`;
+       const exe = `temp_${id}`;
 
-        spawn("g++", [file, "-o", exe]).on("close", () => {
-          processRun = spawn(exe);
-          attachIO(ws, processRun);
-        });
-      }
+       fs.writeFileSync(file, data.code);
+
+       const compile = spawn("g++", [file, "-o", exe]);
+
+       compile.stderr.on("data", d => {
+       ws.send(JSON.stringify({
+       type: "output",
+       value: d.toString()
+      }));
+    });
+
+    compile.on("close", (code) => {
+
+    if (code !== 0) {
+      ws.send(JSON.stringify({
+        type: "output",
+        value: "\nCompilation Failed ❌"
+      }));
+      return;
+    }
+
+    processRun = spawn(`./${exe}`);
+
+    processRun.on("error", err => {
+      ws.send(JSON.stringify({
+        type: "output",
+        value: "\nExecution Error ❌\n" + err.message
+      }));
+    });
+
+    attachIO(ws, processRun);
+
+  });
+}
 
       else if (data.lang === "Python") {
-        const file = `temp_${id}.py`;
 
-        fs.writeFileSync(file, data.code);
+  const file = `temp_${id}.py`;
 
-        processRun = spawn("python", [file]);
-        attachIO(ws, processRun);
-      }
+  fs.writeFileSync(file, data.code);
 
-      else if (data.lang === "Java") {
-        const className = `Main${id}`;
-        const file = `${className}.java`;
+  processRun = spawn("python", [file]);
 
-        const code = data.code.replace(/class\s+Main/g, `class ${className}`);
-        fs.writeFileSync(file, code);
+  processRun.on("error", err => {
 
-        spawn("javac", [file]).on("close", () => {
-          processRun = spawn("java", [className]);
-          attachIO(ws, processRun);
-        });
-      }
+    ws.send(JSON.stringify({
+      type: "output",
+      value: "\nPython Execution Error ❌\n" + err.message
+    }));
+
+  });
+
+  attachIO(ws, processRun);
+
+}
+
+     else if (data.lang === "Java") {
+
+  const className = `Main${id}`;
+  const file = `${className}.java`;
+
+  const code = data.code.replace(/class\s+Main/g, `class ${className}`);
+
+  fs.writeFileSync(file, code);
+
+  const compile = spawn("javac", [file]);
+
+  compile.stderr.on("data", d => {
+
+    ws.send(JSON.stringify({
+      type: "output",
+      value: d.toString()
+    }));
+
+  });
+
+  compile.on("close", (code) => {
+
+    if (code !== 0) {
+
+      ws.send(JSON.stringify({
+        type: "output",
+        value: "\nCompilation Failed ❌"
+      }));
+
+      return;
+    }
+
+    processRun = spawn("java", [className]);
+
+    processRun.on("error", err => {
+
+      ws.send(JSON.stringify({
+        type: "output",
+        value: "\nExecution Error ❌\n" + err.message
+      }));
+
+    });
+
+    attachIO(ws, processRun);
+
+  });
+
+}
     }
 
     if (data.type === "input" && processRun) {
