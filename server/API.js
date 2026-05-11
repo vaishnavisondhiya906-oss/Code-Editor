@@ -208,7 +208,10 @@ server.listen(PORT, () => {
 
 /* ================= WEBSOCKET ================= */
 
-const wss = new WebSocket.Server({ server });
+const wss = new WebSocket.Server({
+  server,
+  path: "/ws"
+});
 
 wss.on("connection", (ws) => {
     
