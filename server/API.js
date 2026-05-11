@@ -219,27 +219,31 @@ wss.on("connection", (ws) => {
   console.log("⚡ WS Connected");
 
   let processRun = null;
+   ws.on("close", () => {
+    console.log("❌ WS Closed");
 
+    if (processRun) {
+      processRun.kill("SIGKILL");
+    }
+  });
   ws.on("message", (msg) => {
-    const data = JSON.parse(msg);
+    let data;
+
+    try {
+    data = JSON.parse(msg);
+    } catch (err) {
+     ws.send(JSON.stringify({
+     type: "output",
+     value: "Invalid Message"
+    }));
+    return;
+   }
 
     if (data.type === "start") {
 
       if (processRun) processRun.kill("SIGKILL");
 
       const id = Date.now();
-
-      // if (data.lang === "Cpp") {
-      //   const file = `temp_${id}.cpp`;
-      //   const exe = `temp_${id}.exe`;
-
-      //   fs.writeFileSync(file, data.code);
-
-      //   spawn("g++", [file, "-o", exe]).on("close", () => {
-      //     processRun = spawn(exe);
-      //     attachIO(ws, processRun);
-      //   });
-      // }
 
       if (data.lang === "Cpp") {
 
@@ -267,7 +271,9 @@ wss.on("connection", (ws) => {
       return;
     }
 
-    processRun = spawn(`./${exe}`);
+   processRun = spawn(`./${exe}`, [], {
+  stdio: ["pipe", "pipe", "pipe"]
+});
 
     processRun.on("error", err => {
       ws.send(JSON.stringify({
@@ -287,7 +293,9 @@ wss.on("connection", (ws) => {
 
   fs.writeFileSync(file, data.code);
 
-  processRun = spawn("python", [file]);
+  processRun = spawn("python", [file], {
+  stdio: ["pipe", "pipe", "pipe"]
+});
 
   processRun.on("error", err => {
 
@@ -334,7 +342,9 @@ wss.on("connection", (ws) => {
       return;
     }
 
-    processRun = spawn("java", [className]);
+    processRun = spawn("java", [className], {
+  stdio: ["pipe", "pipe", "pipe"]
+});
 
     processRun.on("error", err => {
 
