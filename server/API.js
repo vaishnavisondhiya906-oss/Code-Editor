@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 3000;
 /* ================= DB ================= */
 const db = mysql.createPool({
   
-  
+
 
 //   Render Environment Variables:
 // Key	Value
@@ -369,7 +369,9 @@ wss.on("connection", (ws) => {
     }
 
     if (data.type === "input" && processRun) {
-      processRun.stdin.write(data.value + "\n");
+       if (processRun.stdin.writable) {
+        processRun.stdin.write(data.value + "\n");
+       }
     }
   });
 });
