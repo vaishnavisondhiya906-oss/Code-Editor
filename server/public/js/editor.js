@@ -27,66 +27,81 @@ const output = document.getElementById("output");
 const lang = document.getElementById("lang");
 
 /* ================= SOCKET ================= */
-const socket = new WebSocket("wss://online-code-editor-backend-vowg.onrender.com");
 
-socket.onopen = () => console.log("WS Connected");
-// socket.onerror = (e) => console.log("WS Error", e);
-socket.onerror = (e) => {
-  console.log("WS Error", e);
-  alert("WebSocket connection failed ❌");
-};
-socket.onclose = () => console.log("WS Closed");
+let socket;
 
-/* RECEIVE OUTPUT */
-socket.onmessage = (event) => {
-  const data = JSON.parse(event.data);
+function connectWS() {
 
-  if (data.type === "output") {
-    output.value += data.value;
-    output.scrollTop = output.scrollHeight;
-  }
-};
+  socket = new WebSocket("wss://online-code-editor-backend-vowg.onrender.com");
+
+  socket.onopen = () => {
+    console.log("WS Connected");
+  };
+
+  socket.onerror = (e) => {
+    console.log("WS Error", e);
+  };
+
+  socket.onclose = () => {
+
+    console.log("WS Closed");
+
+    // reconnect automatically
+    setTimeout(() => {
+      connectWS();
+    }, 2000);
+
+  };
+
+  socket.onmessage = (event) => {
+
+    const data = JSON.parse(event.data);
+
+    if (data.type === "output") {
+      output.value += data.value;
+      output.scrollTop = output.scrollHeight;
+    }
+
+  };
+
+}
+
+connectWS();
 
 /* RUN CODE */
-// runBtn.addEventListener("click", () => {
-
-
-//   if (socket.readyState !== WebSocket.OPEN) {
-//     alert("Server connecting... please wait");
-//     return;
-//   }
-
-//   output.value = "";
-
-//   socket.send(JSON.stringify({
-//     type: "start",
-//     code: editor.getValue(),
-//     lang: lang.value
-//   }));
-// });
-
+ 
 runBtn.addEventListener("click", () => {
 
   output.value = "";
 
-  if (socket.readyState === WebSocket.OPEN) {
+  if (socket.readyState !== WebSocket.OPEN) {
 
-    socket.send(JSON.stringify({
-      type: "start",
-      code: editor.getValue(),
-      lang: lang.value
-    }));
+    alert("Server connecting... please wait");
 
-  } else {
-    alert("Server not connected ❌");
+    connectWS();
+
+    return;
   }
 
-});
+  socket.send(JSON.stringify({
+    type: "start",
+    code: editor.getValue(),
+    lang: lang.value
+  }));
+
+ });
 
 /* INPUT SYSTEM */
 input.addEventListener("keydown", (e) => {
+
   if (e.key === "Enter") {
+
     e.preventDefault();
+
+    if (socket.readyState !== WebSocket.OPEN) {
+      alert("Connection lost ❌");
+      return;
+    }
 
     socket.send(JSON.stringify({
       type: "input",
@@ -94,10 +109,11 @@ input.addEventListener("keydown", (e) => {
     }));
 
     output.value += "\n> " + input.value + "\n";
+
     input.value = "";
   }
-});
 
+ });
 /* ================= PRACTICE MODE ================= */
 const params = new URLSearchParams(window.location.search);
 const questionId = params.get("id");
