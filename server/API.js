@@ -211,6 +211,12 @@ server.listen(PORT, () => {
 const wss = new WebSocket.Server({ server });
 
 wss.on("connection", (ws) => {
+    
+   ws.isAlive = true;
+
+   ws.on("pong", () => {
+   ws.isAlive = true;
+   }); 
 
     ws.on("error", (err) => {
     console.log("WS ERROR:", err);
@@ -382,3 +388,20 @@ function attachIO(ws, processRun) {
     ws.send(JSON.stringify({ type: "output", value: "\n[Finished]" }));
   });
 }
+
+/* ================= KEEP WS ALIVE ================= */
+
+setInterval(() => {
+
+  wss.clients.forEach((ws) => {
+
+    if (!ws.isAlive) {
+      return ws.terminate();
+    }
+
+    ws.isAlive = false;
+    ws.ping();
+
+  });
+
+}, 30000);
