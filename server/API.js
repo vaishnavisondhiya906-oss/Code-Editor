@@ -16,10 +16,7 @@ const PORT = process.env.PORT || 3000;
 /* ================= DB ================= */
 const db = mysql.createPool({
   
-  // host: "server",
-  // user: "root",
-  // password: "Rewa@123",
-  // database: "codeeditor",
+  
 
 //   Render Environment Variables:
 // Key	Value
