@@ -32,8 +32,7 @@ let socket;
 
 function connectWS() {
 
-  socket = new WebSocket("wss://online-code-editor-backend-vowg.onrender.com/");
-
+  socket = new WebSocket("wss://online-code-editor-backend-vowg.onrender.com/ws");
   socket.onopen = () => {
     console.log("WS Connected");
   };
