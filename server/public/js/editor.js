@@ -82,37 +82,16 @@ runBtn.addEventListener("click", () => {
     return;
   }
 
-  socket.send(JSON.stringify({
-    type: "start",
-    code: editor.getValue(),
-    lang: lang.value
-  }));
+ socket.send(JSON.stringify({
+  type: "start",
+  code: editor.getValue(),
+  lang: lang.value,
+  input: input.value
+}));
 
  });
 
-/* INPUT SYSTEM */
-input.addEventListener("keydown", (e) => {
 
-  if (e.key === "Enter") {
-
-    e.preventDefault();
-
-    if (socket.readyState !== WebSocket.OPEN) {
-      alert("Connection lost ❌");
-      return;
-    }
-
-    socket.send(JSON.stringify({
-      type: "input",
-      value: input.value
-    }));
-
-    output.value += "\n> " + input.value + "\n";
-
-    input.value = "";
-  }
-
- });
 /* ================= PRACTICE MODE ================= */
 const params = new URLSearchParams(window.location.search);
 const questionId = params.get("id");

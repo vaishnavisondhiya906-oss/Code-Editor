@@ -290,7 +290,10 @@ wss.on("connection", (ws) => {
     });
 
     attachIO(ws, processRun);
-
+    if (data.input) {
+     processRun.stdin.write(data.input + "\n");
+     processRun.stdin.end();
+    }
   });
 }
 
@@ -315,6 +318,10 @@ wss.on("connection", (ws) => {
   });
 
   attachIO(ws, processRun);
+  if (data.input) {
+  processRun.stdin.write(data.input + "\n");
+  processRun.stdin.end();
+}
 
 }
 
@@ -365,7 +372,10 @@ wss.on("connection", (ws) => {
     });
 
     attachIO(ws, processRun);
-
+    if (data.input) {
+     processRun.stdin.write(data.input + "\n");
+     processRun.stdin.end();
+    }
   });
 
 }
