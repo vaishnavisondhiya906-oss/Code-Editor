@@ -11,7 +11,7 @@ async function signup(e) {
   }
 
   try {
-    const res = await fetch("https://online-code-editor-backend-vowg.onrender.com/api/signup", {
+    const res = await fetch("/api/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email, password })
