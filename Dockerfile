@@ -15,4 +15,4 @@ COPY . .
 
 EXPOSE 10000
 
-CMD ["node", "server/API.js"]
+CMD ["node", "API.js"]
