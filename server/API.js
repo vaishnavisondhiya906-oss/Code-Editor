@@ -278,6 +278,7 @@ wss.on("connection", (ws) => {
     }
 
    processRun = spawn(`./${exe}`, [], {
+  shell: true,
   stdio: ["pipe", "pipe", "pipe"]
 });
 
@@ -299,7 +300,8 @@ wss.on("connection", (ws) => {
 
   fs.writeFileSync(file, data.code);
 
-  processRun = spawn("python", [file], {
+  processRun = spawn("python3", [file], {
+  shell: true,
   stdio: ["pipe", "pipe", "pipe"]
 });
 
@@ -348,7 +350,8 @@ wss.on("connection", (ws) => {
       return;
     }
 
-    processRun = spawn("java", [className], {
+   processRun = spawn("java", [className], {
+  shell: true,
   stdio: ["pipe", "pipe", "pipe"]
 });
 
