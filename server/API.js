@@ -368,29 +368,65 @@ wss.on("connection", (ws) => {
 }
     }
 
-    if (data.type === "input" && processRun) {
-       if (processRun.stdin.writable) {
-        processRun.stdin.write(data.value + "\n");
-       }
-    }
+    if (data.type === "input") {
+
+  if (
+    processRun &&
+    processRun.stdin &&
+    processRun.stdin.writable
+  ) {
+
+    processRun.stdin.write(data.value + "\n");
+
+  }
+
+}
   });
 });
 
 /* ================= IO ================= */
 function attachIO(ws, processRun) {
+
   processRun.stdout.on("data", d => {
-    ws.send(JSON.stringify({ type: "output", value: d.toString() }));
+
+    if (ws.readyState === WebSocket.OPEN) {
+
+      ws.send(JSON.stringify({
+        type: "output",
+        value: d.toString()
+      }));
+
+    }
+
   });
 
   processRun.stderr.on("data", d => {
-    ws.send(JSON.stringify({ type: "output", value: d.toString() }));
+
+    if (ws.readyState === WebSocket.OPEN) {
+
+      ws.send(JSON.stringify({
+        type: "output",
+        value: d.toString()
+      }));
+
+    }
+
   });
 
   processRun.on("close", () => {
-    ws.send(JSON.stringify({ type: "output", value: "\n[Finished]" }));
-  });
-}
 
+    if (ws.readyState === WebSocket.OPEN) {
+
+      ws.send(JSON.stringify({
+        type: "output",
+        value: "\n[Finished]"
+      }));
+
+    }
+
+  });
+
+}
 /* ================= KEEP WS ALIVE ================= */
 
 setInterval(() => {
