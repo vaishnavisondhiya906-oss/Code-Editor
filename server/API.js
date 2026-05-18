@@ -15,24 +15,42 @@ const PORT = process.env.PORT || 3000;
 
 /* ================= DB ================= */
 const db = mysql.createPool({
-  
-
-
-//   Render Environment Variables:
-// Key	Value
-// DB_HOST	server
-// DB_USER	root
-// DB_PASSWORD	Rewa@123
-// DB_NAME	codeeditor
-// DB_PORT	3306
-
+ 
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   port: process.env.DB_PORT,
-
+  
 });
+  db.query(`
+CREATE TABLE IF NOT EXISTS users(
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100),
+  email VARCHAR(100) UNIQUE,
+  password VARCHAR(255)
+)
+`);
+
+db.query(`
+CREATE TABLE IF NOT EXISTS questions(
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(255),
+  description TEXT
+)
+`);
+
+db.query(`
+CREATE TABLE IF NOT EXISTS progress(
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT,
+  question_id INT,
+  solved BOOLEAN DEFAULT FALSE,
+  UNIQUE KEY unique_progress(user_id, question_id)
+)
+`);
+
+
   
 
 
