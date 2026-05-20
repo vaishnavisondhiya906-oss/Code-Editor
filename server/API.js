@@ -49,8 +49,6 @@ CREATE TABLE IF NOT EXISTS progress(
   UNIQUE KEY unique_progress(user_id, question_id)
 )
 `);
-
-
   
 
 
