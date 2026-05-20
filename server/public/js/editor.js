@@ -32,7 +32,7 @@ let socket;
 
 function connectWS() {
 
-  socket = new WebSocket("wss://online-code-editor-backend-vowg.onrender.com");
+  socket = new WebSocket("wss://code-editor-skya.onrender.com");
   socket.onopen = () => {
     console.log("WS Connected");
   };
@@ -108,7 +108,7 @@ if (questionId) {
 /* LOAD QUESTION */
 async function loadQuestion() {
   try {
-    const res = await fetch("https://online-code-editor-backend-vowg.onrender.com/api/questions");
+    const res = await fetch("https://code-editor-skya.onrender.com/api/questions");
     const data = await res.json();
 
     const q = data.find(item => item.id == questionId);
@@ -129,7 +129,7 @@ const user = JSON.parse(localStorage.getItem("user"));
 if (questionId && user) {
   document.getElementById("markDone").addEventListener("click", async () => {
 
-    await fetch("https://online-code-editor-backend-vowg.onrender.com/api/progress", {
+    await fetch("https://code-editor-skya.onrender.com/api/progress", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

@@ -10,7 +10,7 @@ if (!user) {
 
 async function loadQuestions(){
   try {
-    const res = await fetch(`https://online-code-editor-backend-vowg.onrender.com/api/progress/${user.id}`);
+    const res = await fetch(`https://code-editor-skya.onrender.com/api/progress/${user.id}`);
     const data = await res.json();
 
     tbody.innerHTML = "";
