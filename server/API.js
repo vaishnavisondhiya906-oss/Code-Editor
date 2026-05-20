@@ -30,7 +30,15 @@ CREATE TABLE IF NOT EXISTS users(
   email VARCHAR(100) UNIQUE,
   password VARCHAR(255)
 )
-`);
+`
+  , (err) => {
+  if (err) {
+    console.log("Users table error:", err);
+  } else {
+    console.log("Users table ready ✅");
+  }
+
+});
 
 db.query(`
 CREATE TABLE IF NOT EXISTS questions(
