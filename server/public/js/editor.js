@@ -1,3 +1,5 @@
+window.onload = () => {
+
 console.log("EDITOR JS LOADED");
 
 const editor = CodeMirror.fromTextArea(
@@ -142,4 +144,5 @@ if (questionId && user) {
 
     alert("✅ Marked Completed");
   });
+}
 }
